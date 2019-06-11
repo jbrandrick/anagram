@@ -1,5 +1,8 @@
 use std::fs;
+use std::thread;
 use md5;
+
+const NTHREADS: usize = 5;
 
 
 struct Word {
@@ -45,16 +48,18 @@ fn string_contains(haystack_in: &str, needle: &str) -> bool {
 struct Solver {
     wordlist: Vec<Word>,
     anagram: Word,
-    md5_hash: String
+    md5_hash: String,
+    range_seq: usize
 }
 
 impl Solver {
-    pub fn new(wordlist_file: &str, anagram_in: &str, md5_hash_in: &str) -> Solver {
+    pub fn new(wordlist_file: &str, anagram_in: &str, md5_hash: &str, range_seq: usize) -> Solver {
         let anagram = Word::new(anagram_in);
         Solver {
             wordlist: Solver::make_wordlist(wordlist_file, &anagram),
             anagram: anagram,
-            md5_hash: md5_hash_in.to_string()
+            md5_hash: md5_hash.to_string(),
+            range_seq: range_seq
         }
     }
 
@@ -90,7 +95,7 @@ impl Solver {
                 else { true }
             })
             .for_each( |words| {
-                println!("{}:{}", level, words.0);
+                println!("{}:{}:{}", self.range_seq, level, words.0);
                 if format!("{:x}", md5::compute(&words.0)) == self.md5_hash {
                     println!("Found phrase: {}", words.0);
                     panic!("done");
@@ -100,8 +105,18 @@ impl Solver {
 }
 
 
-pub(crate) fn anagram(wordlist_file: &str, anagram: &str, md5_hash: &str) {
-    println!("Version 2 ...");
+pub(crate) fn anagram(wordlist_file: &'static str, anagram: &'static str, md5_hash: &'static str) {
+    println!("Version 3 ...");
 
-    Solver::new(wordlist_file, anagram, md5_hash).solve_it();
+    let mut threads = vec![];
+    
+    for i in 0..NTHREADS {
+        threads.push(thread::spawn(move || {
+            Solver::new(wordlist_file, anagram, md5_hash, i).solve_it();
+        }))
+    }
+
+    for thread in threads {
+        let _ = thread.join();
+    }
 }

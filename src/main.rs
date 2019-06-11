@@ -2,6 +2,7 @@ use std::env;
 
 mod anagram1;
 mod anagram2;
+mod anagram3;
 
 const WORDLIST_FILE: &str = "C:\\Users\\120637\\git\\anagram\\wordlist";
 const ANAGARAM: &str = "poultry outwits ants";
@@ -18,7 +19,7 @@ fn main() {
     match version {
         1 => crate::anagram1::anagram(WORDLIST_FILE, ANAGARAM, MD5_HASH_EASY),
         2 => crate::anagram2::anagram(WORDLIST_FILE, ANAGARAM, MD5_HASH_EASY),
-        // 3 => anagram3(),
+        3 => crate::anagram3::anagram(WORDLIST_FILE, ANAGARAM, MD5_HASH_EASY),
         _ => println!("We're not there yet."),
     }
 }

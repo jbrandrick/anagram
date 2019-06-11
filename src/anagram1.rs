@@ -57,15 +57,13 @@ fn combine(words_in: &(String, String), md5_hash: &str, wordlist: &Vec<Word>, an
                 // words.1.len() == anagram.stripped.len()
             // }
         })
-        .filter( |words| {
+        .for_each( |words| {
             println!("{}:{}", level, words.0);
             if format!("{:x}", md5::compute(&words.0)) == md5_hash {
                 println!("Found phrase: {}", words.0);
                 panic!("done");
-            }
-            else { false }
-        })
-        .for_each(drop);
+            };
+        });
 }
 
 pub(crate) fn anagram(wordlist_file: &str, anagram: &str, md5_hash: &str) {

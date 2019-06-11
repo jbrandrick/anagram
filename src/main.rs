@@ -19,6 +19,6 @@ fn main() {
         1 => crate::anagram1::anagram(WORDLIST_FILE, ANAGARAM, MD5_HASH_EASY),
         2 => crate::anagram2::anagram(WORDLIST_FILE, ANAGARAM, MD5_HASH_EASY),
         // 3 => anagram3(),
-        _   => println!("We're not there yet."),
+        _ => println!("We're not there yet."),
     }
 }

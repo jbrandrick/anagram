@@ -1,7 +1,7 @@
 use md5;
 use std::fs;
 use std::thread;
-// use std::sync::Arc;
+use std::sync::Arc;
 
 const NTHREADS: usize = 5;
 
@@ -28,7 +28,7 @@ impl Word {
     }
 }
 
-fn combine(words_in: &str, stripped_in: &str, md5_hash: &str, wordlist: &Vec<Word>, anagram: &Word, level: u8) -> bool {
+fn combine<'a>(words_in: &'a str, stripped_in: &'a str, md5_hash: &str, wordlist: &Vec<Word>, anagram: &Word, level: u8) {
     wordlist
         .iter()
         .map( |word| (format!("{} {}", words_in, word.string), format!("{}{}", stripped_in, word.string)) )
@@ -52,9 +52,7 @@ fn combine(words_in: &str, stripped_in: &str, md5_hash: &str, wordlist: &Vec<Wor
                 false
             }
         })
-        .map( |_words| "" )
-        .collect::<String>()
-        .len() > 0
+        .for_each(drop);
 }
 
 fn string_contains(haystack_in: &str, needle: &str) -> bool {
@@ -78,15 +76,12 @@ fn strip_blanks(original : &str) -> String {
     original.chars().filter( |&c| c != ' ' ).collect()
 }
 
-fn brute_force_search(md5_hash: &str, wordlist: &Vec<Word>, anagram: &Word) {
-
-}
-
-pub(crate) fn anagram(wordlist_file: &str, anagram: &str, md5_hash: &'static str) {
+pub(crate) fn anagram(wordlist_file: &str, anagram: &str, _md5_hash1: &str) {
     println!("Version 2 ...");
-    let anagram_word = Word::new(anagram);
+    let anagram_word = Arc::new(Word::new(anagram));
+    // let md5_hash: &str = "e4820b45d2277f3844eac66c903e84be";
 
-    let wordlist: Vec<Word> = Vec::new();
+    let mut wordlist = Vec::new();
 
     let wordlist_in = fs::read_to_string(wordlist_file).expect("Something went wrong reading the wordlist file");
 
@@ -96,9 +91,6 @@ pub(crate) fn anagram(wordlist_file: &str, anagram: &str, md5_hash: &'static str
             wordlist.push(Word::new(word_in));
         }
     }
-    let wl = &wordlist;
-    println!("Wordlist count: {}", wl.len());
-    println!("Anagram md5 hash: {:x}", md5::compute(anagram));
 
     // wordlist.sort_by( |a,b| b.string.len().cmp(&a.string.len()) );
 
@@ -106,65 +98,11 @@ pub(crate) fn anagram(wordlist_file: &str, anagram: &str, md5_hash: &'static str
     // let wordlist_arc = Arc::new(&wordlist);
 
     for i in 0..NTHREADS {
-        // let wordlist_arc_i = wordlist_arc.clone();
-        // let word = wl.nth(i).unwrap();
+        // let wordlist1 = wordlist.clone();
+        let anagram_word1 = anagram_word.clone();
         threads.push(thread::spawn(move || {
-            // let wl = wordlist;
-            brute_force_search(md5_hash, &wordlist, &anagram_word);
-            combine(&wordlist[i].string, &wordlist[i].stripped, md5_hash, &wordlist, &wordlist[0], 2);
+            println!("{}", anagram_word1.stripped);
+            // combine(&wordlist[i].string, &wordlist[i].stripped, md5_hash, &wordlist, &wordlist[0], 2);
         }))
     }
-
-    // for word in &wordlist {
-    //     let a = thread::spawn(move || {
-    //         combine(&(&word.string, &word.stripped), &wordlist, &anagram_word, 2);
-    //     });
-    // }
-
-    for word in &wordlist {
-        combine(&word.string, &word.stripped, md5_hash, &wordlist, &anagram_word, 2);
-    }
-
-    // wordlist
-    //     .iter()
-    //     .map( |word| {
-    //         println!("{}", &word.string);
-    //         &word.string
-    //     })
-    //     .filter( |word| combine(&(word.to_string(), strip_blanks(word)), &wordlist, &anagram_word, 2))
-
-
-    //     .for_each( |word| println!("Found: {}", word));
 }
-
-// fn load_wordlist(wordlist_file: &str, anagram_word: &Word) -> &Vec<Word> {
-//     let mut wordlist: Vec<Word> = Vec::new();
-
-//     let wordlist_in = fs::read_to_string(wordlist_file).expect("Something went wrong reading the wordlist file");
-
-//     for word_in in wordlist_in.lines() {
-
-//         if anagram_word.contains(word_in) {
-//             wordlist.push(Word::new(word_in));
-//         }
-//     }
-//     let wl = &wordlist;
-//     println!("Wordlist count: {}", wl.len());
-//     &wordlist
-// }
-
-
-/*
-fn vec_compare(va: &[u8], vb: &[u8]) -> bool {
-    (va.len() == vb.len()) &&  // zip stops at the shortest
-     va.iter()
-       .zip(vb)
-       .all(|(a,b)| a == b)
-}
-
-fn vec_contains(va: &[u8], vb: &[u8]) -> bool { // va contains vb
-     va.iter()
-       .zip(vb) // zip stops at the shortest
-       .all(|(a,b)| a == b)
-}
-*/

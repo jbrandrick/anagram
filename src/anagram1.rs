@@ -42,7 +42,7 @@ fn string_contains(haystack_in: &str, needle: &str) -> bool {
         .len() == 0
 }
 
-fn combine(words_in: &(String, String), md5_hash: &str, wordlist: &Vec<Word>, anagram: &Word, level: u8) -> bool {
+fn combine(words_in: &(String, String), md5_hash: &str, wordlist: &Vec<Word>, anagram: &Word, level: u8) {
     wordlist
         .iter()
         .map( |word| (format!("{} {}", words_in.0, word.string), format!("{}{}", words_in.1, word.string)) )
@@ -52,10 +52,10 @@ fn combine(words_in: &(String, String), md5_hash: &str, wordlist: &Vec<Word>, an
                 combine(words, md5_hash, wordlist, anagram, level + 1);
                 false
             }
-            else {
+            else { true }
                 // println!("{}:{}", level, words.0);
-                words.1.len() == anagram.stripped.len()
-            }
+                // words.1.len() == anagram.stripped.len()
+            // }
         })
         .filter( |words| {
             println!("{}:{}", level, words.0);
@@ -63,13 +63,9 @@ fn combine(words_in: &(String, String), md5_hash: &str, wordlist: &Vec<Word>, an
                 println!("Found phrase: {}", words.0);
                 panic!("done");
             }
-            else {
-                true
-            }
+            else { false }
         })
-        .map( |words| words.0 )
-        .collect::<String>()
-        .len() > 0
+        .for_each(drop);
 }
 
 pub(crate) fn anagram(wordlist_file: &str, anagram: &str, md5_hash: &str) {
@@ -89,11 +85,7 @@ pub(crate) fn anagram(wordlist_file: &str, anagram: &str, md5_hash: &str) {
 
     // wordlist.sort_by( |a,b| b.string.len().cmp(&a.string.len()) );
 
-    wordlist
-        .iter()
-        .map( |word| {
-            &word.string
-        })
-        .filter( |word| combine(&(word.to_string(), strip_blanks(word)), md5_hash, &wordlist, &anagram_word, 2))
-        .for_each( |word| println!("Found: {}", word));
+    for word in &wordlist {
+        combine(&(word.string.to_string(), word.stripped.to_string()), md5_hash, &wordlist, &anagram_word, 2);
+    }
 }

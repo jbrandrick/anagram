@@ -4,8 +4,8 @@ mod anagram1;
 mod anagram2;
 mod anagram3;
 
-// const WORDLIST_FILE: &str = "C:\\Users\\120637\\git\\anagram\\wordlist";
-const WORDLIST_FILE: &str = "/Users/John/Documents/GitHub/anagram/wordlist";
+const WORDLIST_FILE: &str = "C:\\Users\\120637\\git\\anagram\\wordlist";
+// const WORDLIST_FILE: &str = "/Users/John/Documents/GitHub/anagram/wordlist";
 const ANAGARAM: &str = "poultry outwits ants";
 const MD5_HASH_EASY: &str = "e4820b45d2277f3844eac66c903e84be";
 // const MD5_HASH_MEDIUM: &str = "23170acc097c24edb98fc5488ab033fe";

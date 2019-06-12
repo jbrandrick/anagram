@@ -2,7 +2,7 @@ use std::fs;
 use std::thread;
 use md5;
 
-const NTHREADS: usize = 5;
+const NTHREADS: usize = 10;
 
 
 struct Word {
@@ -77,7 +77,9 @@ impl Solver {
     }
 
     fn solve_it(&self) {
-        for word in &self.wordlist {
+        let min = self.range_seq * self.wordlist.len() / NTHREADS;
+        let max = min + self.wordlist.len() / NTHREADS;
+        for word in &self.wordlist[min..max] {
             self.combine(&(word.string.to_string(), word.stripped.to_string()), 2);
         }
     }

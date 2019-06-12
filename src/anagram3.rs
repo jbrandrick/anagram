@@ -5,23 +5,22 @@ use md5;
 const NTHREADS: usize = 10;
 
 
-struct Word {
-    string: String,
-    stripped: String
-}
+pub(crate) fn anagram(wordlist_file: &'static str, anagram: &'static str, md5_hash: &'static str) {
+    println!("Version 3 ...");
+
+    let mut threads = vec![];
     
-impl Word {
-    pub fn new(word_in: &str) -> Word {
-        Word {
-            string: word_in.to_string(),
-            stripped: strip_blanks(word_in)
-            }
+    for i in 0..NTHREADS {
+        threads.push(thread::spawn(move || {
+            Solver::new(wordlist_file, anagram, md5_hash, i).solve_it();
+        }))
     }
 
-    fn contains(&self, string_in: &str) -> bool {
-        string_contains(&self.stripped, string_in)
+    for thread in threads {
+        let _ = thread.join();
     }
 }
+
 
 fn strip_blanks(original : &str) -> String {
     original.chars().filter( |&c| c != ' ' ).collect()
@@ -42,6 +41,25 @@ fn string_contains(haystack_in: &str, needle: &str) -> bool {
         })
         .collect::<String>()
         .len() == 0
+}
+
+
+struct Word {
+    string: String,
+    stripped: String
+}
+    
+impl Word {
+    pub fn new(word_in: &str) -> Word {
+        Word {
+            string: word_in.to_string(),
+            stripped: strip_blanks(word_in)
+            }
+    }
+
+    fn contains(&self, string_in: &str) -> bool {
+        string_contains(&self.stripped, string_in)
+    }
 }
 
 
@@ -103,22 +121,5 @@ impl Solver {
                     panic!("done");
                 };
             });
-    }
-}
-
-
-pub(crate) fn anagram(wordlist_file: &'static str, anagram: &'static str, md5_hash: &'static str) {
-    println!("Version 3 ...");
-
-    let mut threads = vec![];
-    
-    for i in 0..NTHREADS {
-        threads.push(thread::spawn(move || {
-            Solver::new(wordlist_file, anagram, md5_hash, i).solve_it();
-        }))
-    }
-
-    for thread in threads {
-        let _ = thread.join();
     }
 }

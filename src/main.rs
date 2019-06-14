@@ -3,6 +3,7 @@ use std::env;
 mod anagram1;
 mod anagram2;
 mod anagram3;
+mod anagram4;
 
 const WORDLIST_FILE: &str = "C:\\Users\\120637\\git\\anagram\\wordlist";
 // const WORDLIST_FILE: &str = "/Users/John/Documents/GitHub/anagram/wordlist";
@@ -21,6 +22,7 @@ fn main() {
         1 => crate::anagram1::anagram(WORDLIST_FILE, ANAGARAM, MD5_HASH_EASY),
         2 => crate::anagram2::anagram(WORDLIST_FILE, ANAGARAM, MD5_HASH_EASY),
         3 => crate::anagram3::anagram(WORDLIST_FILE, ANAGARAM, MD5_HASH_EASY),
+        4 => crate::anagram4::anagram(WORDLIST_FILE, ANAGARAM, MD5_HASH_EASY),
         _ => println!("We're not there yet."),
     }
 }
